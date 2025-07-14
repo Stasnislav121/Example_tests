@@ -1,0 +1,4 @@
+from .TermsPackagingPage import TermsPackagingPage as TermsPackagingPage
+from .TermsDeliveryPage import TermsDeliveryPage as TermsDeliveryPage
+from .TermsDocumentsPage import TermsDocumentsPage as TermsDocumentsPage
+from .TermsPaymentInfoPage import TermsPaymentInfoPage as TermsPaymentInfoPage

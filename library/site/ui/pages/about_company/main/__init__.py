@@ -1,0 +1,1 @@
+from .AboutCompanyMainPage import AboutCompanyMainPage as AboutCompanyMainPage

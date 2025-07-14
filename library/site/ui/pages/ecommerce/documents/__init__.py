@@ -1,0 +1,5 @@
+from .DocumentsAttachmentsProhibitedPage import DocumentsAttachmentsProhibitedPage as DocumentsAttachmentsProhibitedPage
+from .DocumentsDocumentsAndTariffsPage import DocumentsDocumentsAndTariffsPage as DocumentsDocumentsAndTariffsPage
+from .DocumentsLicenseAgreementPage import DocumentsLicenseAgreementPage as DocumentsLicenseAgreementPage
+from .DocumentsConfidentialityAgreementPage import DocumentsConfidentialityAgreementPage \
+    as DocumentsConfidentialityAgreementPage

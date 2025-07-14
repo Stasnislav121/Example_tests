@@ -1,0 +1,1 @@
+from .NewsAndPromotionsPage import NewsAndPromotionsPage as NewsAndPromotionsPage

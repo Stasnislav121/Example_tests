@@ -1,0 +1,4 @@
+from .ContactsSupportBaseForm import ContactsSupportBaseForm as ContactsSupportBaseForm
+from .ContactsSupportClientForm import ContactsSupportClientForm as ContactsSupportClientForm
+from .ContactsSupportInternetShopForm import ContactsSupportInternetShopForm as ContactsSupportInternetShopForm
+from .ContactsSupportPointForm import ContactsSupportPointForm as ContactsSupportPointForm

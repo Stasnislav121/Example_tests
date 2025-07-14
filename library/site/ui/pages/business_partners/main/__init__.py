@@ -1,0 +1,1 @@
+from .BusinessPartnersMainPage import BusinessPartnersMainPage as BusinessPartnersMainPage
