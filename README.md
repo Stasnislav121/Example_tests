@@ -1,3 +1,5 @@
+## Примеры тестов на Python: UI - Playwright, API - Requests
+
 ## Требования
 
 Python версии 3.8
