@@ -74,25 +74,20 @@ jobs:
       run: |
         # Запуск pytest с генерацией отчетов Allure
         pytest -m "forci" --alluredir=./allure-results -v
+    
+    # Используем готовый Action для установки Allure
+    - name: Install Allure
+      uses: simple-elf/allure-report-action@v1.7
+      with:
+        version: 2.24.0
 
-    # Шаг 6: Загрузка результатов тестов как артефакт
+    # Генерируем отчет
     - name: Generate Allure report
       if: always()
       run: |
-        # Создаем директорию для установки Allure в домашней директории
-        mkdir -p $HOME/allure
-        cd $HOME/allure
-        
-        # Скачиваем и распаковываем Allure
-        curl -o allure-2.24.0.tgz -Ls https://github.com/allure-framework/allure2/releases/download/2.24.0/allure-2.24.0.tgz
-        tar -zxvf allure-2.24.0.tgz
-        echo "$HOME/allure/allure-2.24.0/bin" >> $GITHUB_PATH
-        rm -f allure-2.24.0.tgz
-        
-        # Генерируем отчет
-        cd $GITHUB_WORKSPACE
         allure generate ./allure-results -o ./allure-report --clean
     
+    # Публикуем отчет на GitHub Pages
     - name: Deploy to GitHub Pages
       if: always()
       uses: peaceiris/actions-gh-pages@v3
