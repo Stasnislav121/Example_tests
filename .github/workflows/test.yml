@@ -75,17 +75,29 @@ jobs:
         # Запуск pytest с генерацией отчетов Allure
         pytest -m "forci" --alluredir=./allure-results -v
     
-    # Используем готовый Action для установки Allure
-    - name: Install Allure CLI
-      uses: flaconi/actions-allure@v1.2.0
-      with:
-        version: 2.24.0
+    # Ручная установка Allure CLI
+    - name: Install Allure CLI manually
+      run: |
+        # Создаем директорию для установки Allure
+        mkdir -p $HOME/allure
+        cd $HOME/allure
+        
+        # Скачиваем и распаковываем Allure
+        curl -o allure-2.24.0.tgz -Ls https://github.com/allure-framework/allure2/releases/download/2.24.0/allure-2.24.0.tgz
+        tar -zxvf allure-2.24.0.tgz
+        
+        # Добавляем Allure в PATH для текущего шага
+        echo "$HOME/allure/allure-2.24.0/bin" >> $GITHUB_PATH
+        
+        # Проверяем установку
+        echo "Allure version:"
+        $HOME/allure/allure-2.24.0/bin/allure --version
     
-    # Генерируем отчет
+    # Генерируем отчет с использованием полного пути к allure
     - name: Generate Allure report
       if: always()
       run: |
-        allure generate ./allure-results -o ./allure-report --clean
+        $HOME/allure/allure-2.24.0/bin/allure generate ./allure-results -o ./allure-report --clean
     
     # Публикуем отчет на GitHub Pages
     - name: Deploy to GitHub Pages
