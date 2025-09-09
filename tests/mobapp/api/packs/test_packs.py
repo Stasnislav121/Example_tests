@@ -16,12 +16,12 @@ class TestPacks:
     @allure.title('[200] GET /packs - получение списка упаковок')
     @allure.testcase(url='https://testit..ru/browse/35397')
     @pytest.mark.parametrize('get_token', ["without_auth"])
+    @pytest.mark.forci
     def test_get_packs(self, array_helper, request, get_token):
         expect_packs = {
                     "id": "799",
                     "title": "Короб ХS",
                     "image": "https://storage.img.net/mobile-app-images/packs/799.png?v=1",
-                    "": True,
                     "length": 15,
                     "width": 15,
                     "height": 15,
