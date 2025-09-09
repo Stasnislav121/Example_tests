@@ -151,7 +151,7 @@ jobs:
         MESSAGE+="• ✅ Успешных: ${{ steps.run-tests.outputs.passed_tests }}%0A"
         MESSAGE+="• ❌ Проваленных: ${{ steps.run-tests.outputs.failed_tests }}%0A"
         MESSAGE+="• ⏩ Пропущенных: ${{ steps.run-tests.outputs.skipped_tests }}%0A%0A"
-        MESSAGE+="*📝 Отчет Allure:* [Посмотреть отчет](https://stanislav121.github.io/Example_tests/)%0A"
+        MESSAGE+="*📝 Отчет Allure:* [Посмотреть отчет](https://stasnislav121.github.io/Example_tests/)%0A"
         MESSAGE+="*🔍 Детали запуска:* [Посмотреть запуск](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
         
         # Отправляем сообщение в Telegram
