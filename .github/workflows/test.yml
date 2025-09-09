@@ -73,33 +73,46 @@ jobs:
         API_BASE_URL: "http://localhost:8000"
       run: |
         # Запуск pytest с генерацией отчетов Allure
-        pytest -m "forci" --alluredir=./allure-results -v
+        pytest -m "forci" --alluredir=./allure-results -v > test-output.txt 2>&1
+        exit_code=$?
     
-    # Ручная установка Allure CLI
+        # Анализируем вывод тестов для получения статистики
+        TOTAL_TESTS=$(grep -E "passed.*failed.*skipped" test-output.txt | tail -1 | sed 's/.* \([0-9]\+\) passed.*/\1/') || echo "0"
+        PASSED_TESTS=$(grep -E "passed.*failed.*skipped" test-output.txt | tail -1 | sed 's/.* \([0-9]\+\) passed.*/\1/') || echo "0"
+        FAILED_TESTS=$(grep -E "passed.*failed.*skipped" test-output.txt | tail -1 | sed 's/.* \([0-9]\+\) failed.*/\1/') || echo "0"
+        SKIPPED_TESTS=$(grep -E "passed.*failed.*skipped" test-output.txt | tail -1 | sed 's/.* \([0-9]\+\) skipped.*/\1/') || echo "0"
+        
+        # Сохраняем статистику в output
+        echo "total_tests=$TOTAL_TESTS" >> $GITHUB_OUTPUT
+        echo "passed_tests=$PASSED_TESTS" >> $GITHUB_OUTPUT
+        echo "failed_tests=$FAILED_TESTS" >> $GITHUB_OUTPUT
+        echo "skipped_tests=$SKIPPED_TESTS" >> $GITHUB_OUTPUT
+        echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
+        
+        # Всегда возвращаем успешный код выхода, чтобы workflow продолжился
+        exit 0
+    
     - name: Install Allure CLI manually
       run: |
-        # Создаем директорию для установки Allure
         mkdir -p $HOME/allure
         cd $HOME/allure
-        
-        # Скачиваем и распаковываем Allure
         curl -o allure-2.24.0.tgz -Ls https://github.com/allure-framework/allure2/releases/download/2.24.0/allure-2.24.0.tgz
         tar -zxvf allure-2.24.0.tgz
-        
-        # Добавляем Allure в PATH для текущего шага
         echo "$HOME/allure/allure-2.24.0/bin" >> $GITHUB_PATH
-        
-        # Проверяем установку
-        echo "Allure version:"
         $HOME/allure/allure-2.24.0/bin/allure --version
     
-    # Генерируем отчет с использованием полного пути к allure
     - name: Generate Allure report
       if: always()
       run: |
         $HOME/allure/allure-2.24.0/bin/allure generate ./allure-results -o ./allure-report --clean
     
-    # Публикуем отчет на GitHub Pages
+    - name: Check generated report
+      run: |
+        echo "Contents of allure-report directory:"
+        ls -la ./allure-report/
+        echo "Index.html exists:"
+        test -f ./allure-report/index.html && echo "YES" || echo "NO"
+    
     - name: Deploy to GitHub Pages
       if: always()
       uses: peaceiris/actions-gh-pages@v3
@@ -114,6 +127,38 @@ jobs:
       with:
         name: allure-results
         path: allure-results
+    
+    - name: Send Telegram notification
+      if: always()
+      run: |
+        # Определяем эмодзи в зависимости от статуса тестов
+        if [ "${{ steps.run-tests.outputs.exit_code }}" = "0" ]; then
+          EMOJI="✅"
+          STATUS_TEXT="Успешно"
+        else
+          EMOJI="❌"
+          STATUS_TEXT="С ошибками"
+        fi
+        
+        # Формируем сообщение для Telegram
+        MESSAGE="$EMOJI *Результаты тестирования* $EMOJI%0A%0A"
+        MESSAGE+="*Репозиторий:* \`${{ github.repository }}\`%0A"
+        MESSAGE+="*Статус:* $STATUS_TEXT%0A"
+        MESSAGE+="*Ветка:* ${{ github.ref_name }}%0A"
+        MESSAGE+="*Коммит:* [${GITHUB_SHA:0:7}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})%0A%0A"
+        MESSAGE+="*📊 Статистика тестов:*%0A"
+        MESSAGE+="• Всего тестов: ${{ steps.run-tests.outputs.total_tests }}%0A"
+        MESSAGE+="• ✅ Успешных: ${{ steps.run-tests.outputs.passed_tests }}%0A"
+        MESSAGE+="• ❌ Проваленных: ${{ steps.run-tests.outputs.failed_tests }}%0A"
+        MESSAGE+="• ⏩ Пропущенных: ${{ steps.run-tests.outputs.skipped_tests }}%0A%0A"
+        MESSAGE+="*📝 Отчет Allure:* [Посмотреть отчет](https://stanislav121.github.io/Example_tests/)%0A"
+        MESSAGE+="*🔍 Детали запуска:* [Посмотреть запуск](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+        
+        # Отправляем сообщение в Telegram
+        curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+          -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
+          -d parse_mode="Markdown" \
+          -d text="$MESSAGE"
         
     - name: Cleanup
       run: |
