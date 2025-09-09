@@ -12,3 +12,4 @@ testit-api-client==4.0.0
 testit-python-commons==3.2.6
 urllib3~=1.26.18
 jsonschema~=4.17.3
+pytz~=2024.1
