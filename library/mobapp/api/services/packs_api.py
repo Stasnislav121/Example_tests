@@ -15,6 +15,7 @@ class PacksApi(BaseApiClient):
             response = self.get('',
                                 headers=self.headers,
                                 print_url=False)
+            print()
             if check_error:
                 ResponseHandler.check_response_code_is_200(response)
                 ResponseHandler.check_response_has_success_is_true(response)

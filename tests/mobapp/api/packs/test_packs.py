@@ -37,5 +37,5 @@ class TestPacks:
             ResponseHandler.validate_response(response, packs_schema)
 
         with allure.step('Проверка параметров ответа'):
-            packs_resp = response.json()['data']
+            packs_resp = response.json()['data']['boxes'][0]
             array_helper.assert_arrays(expect_packs, packs_resp)
