@@ -3,6 +3,7 @@ name: Run Tests with Mock Server
 
 # Триггеры для запуска workflow
 on:
+  workflow_dispatch: # Для ручного запуска
   push:
     branches: [ master ]  # Запуск при пуше в ветку master
   pull_request:
@@ -19,7 +20,7 @@ jobs:
       # Сервис мок-сервера
       mock-server:
         # Использование образа из GitHub Container Registry
-        image: ghcr.io/stanislav121/example-mock-server:main
+        image: ghcr.io/stanislav121/mock-server-for-autotests:main
         # Проброс порта 8000 из контейнера на хост
         ports:
           - 8000:8000
@@ -39,7 +40,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'  # Указание версии Python
+        python-version: '3.8'  # Указание версии Python
 
     # Шаг 3: Установка зависимостей для тестов
     - name: Install dependencies
