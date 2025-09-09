@@ -76,11 +76,11 @@ jobs:
         pytest -m "forci" --alluredir=./allure-results -v
     
     # Используем готовый Action для установки Allure
-    - name: Install Allure
-      uses: simple-elf/allure-report-action@v1.7
+    - name: Install Allure CLI
+      uses: flaconi/actions-allure@v1.2.0
       with:
         version: 2.24.0
-
+    
     # Генерируем отчет
     - name: Generate Allure report
       if: always()
