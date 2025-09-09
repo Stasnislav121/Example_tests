@@ -1,0 +1,80 @@
+# Название workflow для запуска тестов
+name: Run Tests with Mock Server
+
+# Триггеры для запуска workflow
+on:
+  push:
+    branches: [ main ]  # Запуск при пуше в ветку main
+  pull_request:
+    branches: [ main ]  # Запуск при создании PR в ветку main
+
+# Определение job'ы тестирования
+jobs:
+  test:
+    # Запуск на последней версии Ubuntu
+    runs-on: ubuntu-latest
+
+    # Определение сервисов, необходимых для job'ы
+    services:
+      # Сервис мок-сервера
+      mock-server:
+        # Использование образа из GitHub Container Registry
+        image: ghcr.io/${{ github.repository_owner }}/example-mock-server:main
+        # Проброс порта 8000 из контейнера на хост
+        ports:
+          - 8000:8000
+        # Настройка healthcheck для контейнера
+        options: >-
+          --health-cmd "curl -f http://localhost:8000/health || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    # Шаги выполнения job'ы
+    steps:
+    # Шаг 1: Получение кода автотестов
+    - uses: actions/checkout@v4
+
+    # Шаг 2: Установка Python
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'  # Указание версии Python
+
+    # Шаг 3: Установка зависимостей для тестов
+    - name: Install dependencies
+      run: |
+        # Обновление pip до последней версии
+        python -m pip install --upgrade pip
+        # Установка зависимостей из requirements.txt
+        pip install -r requirements.txt
+
+    # Шаг 4: Ожидание готовности мок-сервера
+    - name: Wait for mock server
+      run: |
+        # Попытка подключения к мок-серверу в течение 10 попыток
+        for i in {1..10}; do
+          # Проверка доступности эндпоинта здоровья
+          if curl -s http://localhost:8000/health > /dev/null; then
+            echo "Mock server is ready!"
+            break
+          fi
+          echo "Waiting for mock server... ($i/10)"
+          sleep 5  # Ожидание 5 секунд между попытками
+        done
+
+    # Шаг 5: Запуск тестов
+    - name: Run tests
+      env:
+        # Установка переменной окружения с базовым URL API
+        API_BASE_URL: "http://localhost:8000"
+      run: |
+        # Запуск pytest с генерацией отчетов Allure
+        pytest --alluredir=./allure-results -v
+
+    # Шаг 6: Загрузка результатов тестов как артефакт
+    - name: Upload Allure results
+      uses: actions/upload-artifact@v3
+      with:
+        name: allure-results  # Имя артефакта
+        path: allure-results  # Путь к результатам
