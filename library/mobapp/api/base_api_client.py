@@ -11,7 +11,7 @@ class BaseApiClient(ApiClient):
 
     def __init__(self, service, version='v2'):
         self.version = version
-        self.base_address = f"https://mobile..ru/api/{self.version}/{service}"
+        self.base_address = f"http://127.0.0.1:8000"
         self.headers = {
             'X-Access-Token': self.access_token,
             'Device-Id': self.device_id
