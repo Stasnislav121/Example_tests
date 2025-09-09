@@ -4,9 +4,9 @@ name: Run Tests with Mock Server
 # Триггеры для запуска workflow
 on:
   push:
-    branches: [ main ]  # Запуск при пуше в ветку main
+    branches: [ master ]  # Запуск при пуше в ветку master
   pull_request:
-    branches: [ main ]  # Запуск при создании PR в ветку main
+    branches: [ master ]  # Запуск при создании PR в ветку master
 
 # Определение job'ы тестирования
 jobs:
@@ -48,6 +48,7 @@ jobs:
         python -m pip install --upgrade pip
         # Установка зависимостей из requirements.txt
         pip install -r requirements.txt
+        pip install -r requirements-api.txt
 
     # Шаг 4: Ожидание готовности мок-сервера
     - name: Wait for mock server
