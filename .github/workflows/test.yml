@@ -77,18 +77,26 @@ jobs:
         pytest -m "forci" --alluredir=./allure-results -v > test-output.txt 2>&1
         exit_code=$?
         
-        # Анализируем вывод тестов для получения статистики
-        TEST_SUMMARY=$(grep -E "passed.*failed.*skipped|failed.*passed.*skipped" test-output.txt | tail -1)
+        # Выводим содержимое файла для отладки
+        echo "=== TEST OUTPUT ==="
+        cat test-output.txt
+        echo "==================="
+        
+        # Извлекаем статистику тестов более надежным способом
+        # Ищем строку с результатами в конце вывода
+        TEST_RESULTS=$(tail -20 test-output.txt | grep -E "(passed|failed|skipped|deselected)" | tail -1)
         
         # Извлекаем числа с помощью awk
-        PASSED_TESTS=$(echo "$TEST_SUMMARY" | awk '{for(i=1;i<=NF;i++)if($i~/passed/){print $(i-1)}}' | head -1)
-        FAILED_TESTS=$(echo "$TEST_SUMMARY" | awk '{for(i=1;i<=NF;i++)if($i~/failed/){print $(i-1)}}' | head -1)
-        SKIPPED_TESTS=$(echo "$TEST_SUMMARY" | awk '{for(i=1;i<=NF;i++)if($i~/skipped/){print $(i-1)}}' | head -1)
+        PASSED_TESTS=$(echo "$TEST_RESULTS" | awk '{for(i=1;i<=NF;i++)if($i~/passed/ && $(i-1)~/^[0-9]+$/)print $(i-1)}' | head -1)
+        FAILED_TESTS=$(echo "$TEST_RESULTS" | awk '{for(i=1;i<=NF;i++)if($i~/failed/ && $(i-1)~/^[0-9]+$/)print $(i-1)}' | head -1)
+        SKIPPED_TESTS=$(echo "$TEST_RESULTS" | awk '{for(i=1;i<=NF;i++)if($i~/skipped/ && $(i-1)~/^[0-9]+$/)print $(i-1)}' | head -1)
+        DESELECTED_TESTS=$(echo "$TEST_RESULTS" | awk '{for(i=1;i<=NF;i++)if($i~/deselected/ && $(i-1)~/^[0-9]+$/)print $(i-1)}' | head -1)
         
         # Устанавливаем значения по умолчанию, если не найдены
         PASSED_TESTS=${PASSED_TESTS:-0}
         FAILED_TESTS=${FAILED_TESTS:-0}
         SKIPPED_TESTS=${SKIPPED_TESTS:-0}
+        DESELECTED_TESTS=${DESELECTED_TESTS:-0}
         
         # Вычисляем общее количество тестов
         TOTAL_TESTS=$((PASSED_TESTS + FAILED_TESTS + SKIPPED_TESTS))
@@ -98,6 +106,7 @@ jobs:
         echo "passed_tests=$PASSED_TESTS" >> $GITHUB_OUTPUT
         echo "failed_tests=$FAILED_TESTS" >> $GITHUB_OUTPUT
         echo "skipped_tests=$SKIPPED_TESTS" >> $GITHUB_OUTPUT
+        echo "deselected_tests=$DESELECTED_TESTS" >> $GITHUB_OUTPUT
         echo "exit_code=$exit_code" >> $GITHUB_OUTPUT
         
         # Всегда возвращаем успешный код выхода, чтобы workflow продолжился
@@ -161,7 +170,8 @@ jobs:
         MESSAGE+="• Всего тестов: ${{ steps.run-tests.outputs.total_tests }}%0A"
         MESSAGE+="• ✅ Успешных: ${{ steps.run-tests.outputs.passed_tests }}%0A"
         MESSAGE+="• ❌ Проваленных: ${{ steps.run-tests.outputs.failed_tests }}%0A"
-        MESSAGE+="• ⏩ Пропущенных: ${{ steps.run-tests.outputs.skipped_tests }}%0A%0A"
+        MESSAGE+="• ⏩ Пропущенных: ${{ steps.run-tests.outputs.skipped_tests }}%0A"
+        MESSAGE+="• 🔶 Исключенных: ${{ steps.run-tests.outputs.deselected_tests }}%0A%0A"
         MESSAGE+="*📝 Отчет Allure:* [Посмотреть отчет](https://stasnislav121.github.io/Example_tests/)%0A"
         MESSAGE+="*🔍 Детали запуска:* [Посмотреть запуск](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
         
