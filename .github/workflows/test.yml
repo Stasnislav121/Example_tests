@@ -73,7 +73,7 @@ jobs:
         API_BASE_URL: "http://localhost:8000"
       run: |
         # Запуск pytest с генерацией отчетов Allure
-        pytest --alluredir=./allure-results -v
+        pytest -m "forci" --alluredir=./allure-results -v
 
     # Шаг 6: Загрузка результатов тестов как артефакт
     - name: Upload Allure results
