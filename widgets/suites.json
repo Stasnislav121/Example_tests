@@ -1,0 +1,1 @@
+{"total":2,"items":[{"uid":"45bdacc7dd45e13d0581380123c53fe5","name":"tests.mobapp.api.parcels.calc","statistic":{"failed":0,"broken":0,"skipped":0,"passed":5,"unknown":0,"total":5}},{"uid":"fef4e844454022df3b4a699254e037cd","name":"tests.mobapp.api.packs","statistic":{"failed":0,"broken":0,"skipped":0,"passed":1,"unknown":0,"total":1}}]}

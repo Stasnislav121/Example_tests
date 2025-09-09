@@ -1,0 +1,7 @@
+"Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
+"passed","Tue Sep 09 20:20:59 GMT 2025","Tue Sep 09 20:20:59 GMT 2025","12","tests.mobapp.api.packs","test_packs","TestPacks","","","[200] GET /packs - получение списка упаковок",""
+"passed","Tue Sep 09 20:21:00 GMT 2025","Tue Sep 09 20:21:00 GMT 2025","8","tests.mobapp.api.parcels.calc","test_parcels_calc_validation","TestParcelsCalcValidation","","","[400] POST parcels/calc - получение ошибки при несуществующем ""deliveryId""",""
+"passed","Tue Sep 09 20:20:59 GMT 2025","Tue Sep 09 20:21:00 GMT 2025","14","tests.mobapp.api.parcels.calc","test_parcels_calc","TestParcelsCalc","","","[201] POST parcels/calc - разные виды доставки",""
+"passed","Tue Sep 09 20:20:59 GMT 2025","Tue Sep 09 20:20:59 GMT 2025","14","tests.mobapp.api.parcels.calc","test_parcels_calc","TestParcelsCalc","","","[201] POST parcels/calc - разные виды доставки",""
+"passed","Tue Sep 09 20:20:59 GMT 2025","Tue Sep 09 20:20:59 GMT 2025","14","tests.mobapp.api.parcels.calc","test_parcels_calc","TestParcelsCalc","","","[201] POST parcels/calc - разные виды доставки",""
+"passed","Tue Sep 09 20:21:00 GMT 2025","Tue Sep 09 20:21:00 GMT 2025","14","tests.mobapp.api.parcels.calc","test_parcels_calc","TestParcelsCalc","","","[201] POST parcels/calc - разные виды доставки",""

@@ -1,0 +1,1 @@
+{'senderCityCode': '16', 'receiverCityCode': '68', 'deliveryId': 'doorToDoor', 'declaredPrice': {'value': 5000, 'code': 'RUB'}, 'package': '799', 'paidByReceiver': False, 'additionalServices': ['1327', '1344']}
