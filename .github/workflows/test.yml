@@ -68,19 +68,30 @@ jobs:
 
     # Шаг 5: Запуск тестов
     - name: Run tests
+      id: run-tests
       env:
         # Установка переменной окружения с базовым URL API
         API_BASE_URL: "http://localhost:8000"
       run: |
-        # Запуск pytest с генерацией отчетов Allure
+        # Запускаем тесты и сохраняем вывод
         pytest -m "forci" --alluredir=./allure-results -v > test-output.txt 2>&1
         exit_code=$?
-    
+        
         # Анализируем вывод тестов для получения статистики
-        TOTAL_TESTS=$(grep -E "passed.*failed.*skipped" test-output.txt | tail -1 | sed 's/.* \([0-9]\+\) passed.*/\1/') || echo "0"
-        PASSED_TESTS=$(grep -E "passed.*failed.*skipped" test-output.txt | tail -1 | sed 's/.* \([0-9]\+\) passed.*/\1/') || echo "0"
-        FAILED_TESTS=$(grep -E "passed.*failed.*skipped" test-output.txt | tail -1 | sed 's/.* \([0-9]\+\) failed.*/\1/') || echo "0"
-        SKIPPED_TESTS=$(grep -E "passed.*failed.*skipped" test-output.txt | tail -1 | sed 's/.* \([0-9]\+\) skipped.*/\1/') || echo "0"
+        TEST_SUMMARY=$(grep -E "passed.*failed.*skipped|failed.*passed.*skipped" test-output.txt | tail -1)
+        
+        # Извлекаем числа с помощью awk
+        PASSED_TESTS=$(echo "$TEST_SUMMARY" | awk '{for(i=1;i<=NF;i++)if($i~/passed/){print $(i-1)}}' | head -1)
+        FAILED_TESTS=$(echo "$TEST_SUMMARY" | awk '{for(i=1;i<=NF;i++)if($i~/failed/){print $(i-1)}}' | head -1)
+        SKIPPED_TESTS=$(echo "$TEST_SUMMARY" | awk '{for(i=1;i<=NF;i++)if($i~/skipped/){print $(i-1)}}' | head -1)
+        
+        # Устанавливаем значения по умолчанию, если не найдены
+        PASSED_TESTS=${PASSED_TESTS:-0}
+        FAILED_TESTS=${FAILED_TESTS:-0}
+        SKIPPED_TESTS=${SKIPPED_TESTS:-0}
+        
+        # Вычисляем общее количество тестов
+        TOTAL_TESTS=$((PASSED_TESTS + FAILED_TESTS + SKIPPED_TESTS))
         
         # Сохраняем статистику в output
         echo "total_tests=$TOTAL_TESTS" >> $GITHUB_OUTPUT
@@ -91,7 +102,7 @@ jobs:
         
         # Всегда возвращаем успешный код выхода, чтобы workflow продолжился
         exit 0
-    
+
     - name: Install Allure CLI manually
       run: |
         mkdir -p $HOME/allure
@@ -100,19 +111,19 @@ jobs:
         tar -zxvf allure-2.24.0.tgz
         echo "$HOME/allure/allure-2.24.0/bin" >> $GITHUB_PATH
         $HOME/allure/allure-2.24.0/bin/allure --version
-    
+
     - name: Generate Allure report
       if: always()
       run: |
         $HOME/allure/allure-2.24.0/bin/allure generate ./allure-results -o ./allure-report --clean
-    
+
     - name: Check generated report
       run: |
         echo "Contents of allure-report directory:"
         ls -la ./allure-report/
         echo "Index.html exists:"
         test -f ./allure-report/index.html && echo "YES" || echo "NO"
-    
+
     - name: Deploy to GitHub Pages
       if: always()
       uses: peaceiris/actions-gh-pages@v3
@@ -120,14 +131,14 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./allure-report
         keep_files: false
-    
+
     - name: Upload Allure results
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: allure-results
         path: allure-results
-    
+
     - name: Send Telegram notification
       if: always()
       run: |
@@ -159,7 +170,7 @@ jobs:
           -d chat_id="${{ secrets.TELEGRAM_CHAT_ID }}" \
           -d parse_mode="Markdown" \
           -d text="$MESSAGE"
-        
+
     - name: Cleanup
       run: |
         docker stop mock-server || true
