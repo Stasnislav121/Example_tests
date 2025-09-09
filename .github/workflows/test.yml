@@ -26,7 +26,7 @@ jobs:
           - 8000:8000
         # Настройка healthcheck для контейнера
         options: >-
-          --health-cmd "nc -z http://localhost:8000/health || exit 1"
+          --health-cmd "curl -f http://localhost:8000/health || exit 1"
           --health-interval=5s
           --health-timeout=3s
           --health-start-period=10s
