@@ -79,17 +79,22 @@ jobs:
     - name: Generate Allure report
       if: always()
       run: |
-        # Устанавливаем Allure CLI
+        # Создаем директорию для установки Allure в домашней директории
+        mkdir -p $HOME/allure
+        cd $HOME/allure
+        
+        # Скачиваем и распаковываем Allure
         curl -o allure-2.24.0.tgz -Ls https://github.com/allure-framework/allure2/releases/download/2.24.0/allure-2.24.0.tgz
-        tar -zxvf allure-2.24.0.tgz -C /usr/local --strip-components=1
-        echo "/usr/local/bin" >> $GITHUB_PATH
+        tar -zxvf allure-2.24.0.tgz
+        echo "$HOME/allure/allure-2.24.0/bin" >> $GITHUB_PATH
         rm -f allure-2.24.0.tgz
         
         # Генерируем отчет
+        cd $GITHUB_WORKSPACE
         allure generate ./allure-results -o ./allure-report --clean
     
     - name: Deploy to GitHub Pages
-      if: always()  # Всегда публикуем отчет, независимо от результата тестов
+      if: always()
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
