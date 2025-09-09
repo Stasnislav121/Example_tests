@@ -19,7 +19,7 @@ jobs:
       # Сервис мок-сервера
       mock-server:
         # Использование образа из GitHub Container Registry
-        image: ghcr.io/${{ github.repository_owner }}/example-mock-server:main
+        image: ghcr.io/stanislav121/example-mock-server:main
         # Проброс порта 8000 из контейнера на хост
         ports:
           - 8000:8000
