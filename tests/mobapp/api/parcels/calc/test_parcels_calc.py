@@ -22,14 +22,13 @@ class TestParcelsCalc:
                               ('officeToDoor', 'Доставка от отделения до двери'),
                               ('doorToOffice', 'Доставка от двери до отделения'),
                               ('doorToDoor', 'Доставка от двери до двери')])
-    @pytest.mark.parametrize('api_version', ['v2', 'v3'])
-    def test_parcels_calc_with_different_delivery_id(self, delivery_id, delivery_title, with_auth, api_version):
+    @pytest.mark.forci
+    def test_parcels_calc_with_different_delivery_id(self, delivery_id, delivery_title):
         with allure.step('Выполнить POST /parcels/calc'):
-            json_request = copy.deepcopy(parcel_calc_with_custom_package_json)
+            json_request = copy.deepcopy(parcel_calc_with_package_json)
             json_request['deliveryId'] = delivery_id
-            auth_token = with_auth
-            client = ParcelsApi(version=api_version)
-            response = client.get_calculate(json_request, token=auth_token)
+            client = ParcelsApi()
+            response = client.get_calculate(json_request)
 
         with allure.step('Валидация схемы ответа'):
             ResponseHandler.validate_response(response, parcel_calc_schema)

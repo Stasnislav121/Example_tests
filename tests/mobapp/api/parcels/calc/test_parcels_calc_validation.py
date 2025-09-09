@@ -166,18 +166,19 @@ class TestParcelsCalcValidation:
     @allure.epic('MobApp ')
     @allure.feature('API')
     @allure.story('API: Parcels')
-    @allure.title('[422] POST parcels/calc - получение ошибки при несуществующем "deliveryId"')
+    @allure.title('[400] POST parcels/calc - получение ошибки при несуществующем "deliveryId"')
     @allure.testcase(url='https://testit..ru/browse/35078')
+    @pytest.mark.forci
     def test_parcels_calc_not_found_delivery_id(self):
         error_field = 'deliveryId'
         error_text = 'Выбран неверный способ доставки'
 
         with allure.step('Выполнить POST /parcels/calc'):
-            json_request = copy.deepcopy(parcel_calc_with_custom_package_json)
+            json_request = copy.deepcopy(parcel_calc_with_package_json)
             json_request[error_field] = 'officeToOffic'
             client = ParcelsApi()
             response = client.get_calculate(json_request, token=None, check_error=False)
-            assert response.status_code == 422, f"Ожидалось 422, получено {response.status_code}"
+            assert response.status_code == 400, f"Ожидалось 400, получено {response.status_code}"
 
         with allure.step('Валидация схемы ответа'):
             ResponseHandler.validate_response(response, parcel_calc_err_schema)

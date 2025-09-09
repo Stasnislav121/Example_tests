@@ -84,6 +84,7 @@ class ParcelsApi(BaseApiClient):
             if token is not None:
                 self.headers['Authorization'] = token
             response = self.post('/calc', headers=self.headers, json=json)
+            print()
             if check_error:
                 ResponseHandler.check_response_code_is_201(response)
                 ResponseHandler.check_response_has_success_is_true(response)
