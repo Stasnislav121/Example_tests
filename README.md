@@ -7,3 +7,4 @@
 1. Нажать на бейдже "Run Tests"
 [![Run Tests](https://img.shields.io/badge/Run_Tests-GitHub_Actions-blue?logo=github)](https://github.com/Stasnislav121/Example_tests/actions/workflows/test.yml)
 2. После перехода на Github Actions нажать справа "Run workflow"
+3. Просмотреть Allure-отчет: [View Allure Report](https://stanislav121.github.io/example_tests/)
